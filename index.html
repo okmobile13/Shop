@@ -90,7 +90,7 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:36px 20px;color:var(--
     </div>
     <div class="spacer"></div>
     <button class="btn" id="cartBtn">🛒 Panier <span class="cart-badge" id="cartCount">0</span></button>
-    <button class="btn" id="openLogin">Admin</button>
+    <button class="btn" id="openLogin" title="Admin" style="opacity:0.15;padding:10px 12px">⋯</button>
     <button class="btn btn-solid" id="openAdmin" style="display:none">Panel</button>
   </div>
 </div>
@@ -172,7 +172,7 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:36px 20px;color:var(--
 <div class="modal" id="loginModal">
   <div class="box">
     <h3 style="margin-bottom:12px">Connexion Admin</h3>
-    <input id="em" placeholder="Email" value="houbadmohamedismat@gmail.com">
+    <input id="em" placeholder="Email" autocomplete="username">
     <input id="pw" type="password" placeholder="Mot de passe" style="margin-top:8px">
     <button class="btn btn-solid" id="doLogin" style="width:100%;margin-top:12px">Se connecter</button>
     <button class="btn" id="closeLogin" style="width:100%;margin-top:8px">Annuler</button>
@@ -262,10 +262,10 @@ document.getElementById('checkoutWA').onclick = ()=>{
   if(cart.length===0) return alert('Panier vide');
   const name = document.getElementById('cName').value || 'Client';
   const phone = document.getElementById('cPhone').value || '';
-  const items = cart.map(i=>`• ${i.name} x${i.qty} - ${i.price*i.qty} DA`).join('%0A');
+  const items = cart.map(i=>`• ${i.name} x${i.qty} - ${i.price*i.qty} DA`).join('\n');
   const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  const msg = `Commande OK MOBILE%0A%0A${items}%0A%0ATotal: ${total} DA%0A%0ANom: ${name}%0ATél: ${phone}`;
-  window.open(`${whatsappLink}?text=${msg}`, '_blank');
+  const msg = `Commande OK MOBILE\n\n${items}\n\nTotal: ${total} DA\n\nNom: ${name}\nTél: ${phone}`;
+  window.open(`${whatsappLink}?text=${encodeURIComponent(msg)}`, '_blank');
   cart=[]; saveCart(); renderCart(); document.getElementById('cartModal').classList.remove('show');
 };
 updateCartCount();
@@ -316,7 +316,7 @@ doLogin.onclick=async()=>{ try{ await signInWithEmailAndPassword(auth, em.value,
 logout.onclick=()=>signOut(auth);
 openAdmin.onclick=()=>drawer.classList.add('open');
 closeDrawer.onclick=()=>drawer.classList.remove('open');
-onAuthStateChanged(auth, user=>{ const isAdmin=user&&user.email==='houbadmohamedismat@gmail.com'; openAdmin.style.display=isAdmin?'inline-block':'none'; openLogin.style.display=isAdmin?'none':'inline-block'; });
+onAuthStateChanged(auth, user=>{ const adminEmail = atob('aG91YmFkbW9oYW1lZGlzbWF0QGdtYWlsLmNvbQ=='); const isAdmin=user&&user.email===adminEmail; openAdmin.style.display=isAdmin?'inline-block':'none'; openLogin.style.display=isAdmin?'none':'inline-block'; });
 
 // Admin products
 function renderAdminProducts(){ pList.innerHTML = allProducts.filter(p=>p.category!=='Repair').map(p=>`<div class="item"><img src="${p.imageUrl}"><div style="flex:1"><b>${p.name}</b><br><small>${p.price} DA</small></div><button class="btn" onclick="editP('${p.id}')">Edit</button><button class="btn" onclick="delP('${p.id}')">X</button></div>`).join(''); }
@@ -331,8 +331,8 @@ upG.onclick=async()=>{ const f=gFile.files[0]; if(!f)return; const r=ref(storage
 // Repair form -> WhatsApp
 repairForm.onsubmit = (e)=>{
   e.preventDefault();
-  const text = `RDV Réparation OK MOBILE%0A%0ANom: ${rName.value}%0ATél: ${rPhone.value}%0AAppareil: ${rDevice.value}%0AProblème: ${rProblem.value}%0ADate: ${rDate.value}`;
-  window.open(`${whatsappLink}?text=${text}`, '_blank');
+  const text = `RDV Réparation OK MOBILE\n\nNom: ${rName.value}\nTél: ${rPhone.value}\nAppareil: ${rDevice.value}\nProblème: ${rProblem.value}\nDate: ${rDate.value}`;
+  window.open(`${whatsappLink}?text=${encodeURIComponent(text)}`, '_blank');
 };
 
 loadSettings(); loadProducts(); loadGallery();
